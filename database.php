@@ -127,6 +127,10 @@ class DBConn {
 				{
 					$table .= '<tr id=' . $row["klassekode"] . '>';
 				}
+				if($tab === 'bilde')
+				{
+					$table .= '<tr id=' . $row["bilde_id"] . '>';
+				}
 				
 				foreach ($row as $key => $value)
 				{
@@ -155,6 +159,10 @@ class DBConn {
 				if($tab === "klasse")
 				{
 					$table .= '<td> <input data-table="klasse" data-primarykey=' . $row["klassekode"] . ' type="checkbox"> </td>';
+				}
+				if($tab === "bilde")
+				{
+					$table .= '<td> <input data-table="bilde" data-primarykey=' . $row["bilde_id"] . ' type="checkbox"> </td>';
 				}
 						
 				$table .= "</tr>";

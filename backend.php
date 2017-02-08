@@ -17,10 +17,6 @@ if(!empty($_GET["get"]))
 			{
 				echo QueryResult($e->getMessage());
 			}
-			finally
-			{
-				unset($db);
-			}
 			break;
 		}
 			
@@ -29,16 +25,27 @@ if(!empty($_GET["get"]))
 			try 
 			{
 				$db = new DBConn();
-				$db->RunQuery("SELECT brukernavn as Brukernavn, fornavn as Fornavn, etternavn as Etternavn, klassekode as Klassekode FROM student;");
+				$db->RunQuery("SELECT brukernavn as Brukernavn, fornavn as Fornavn,
+				 etternavn as Etternavn, klassekode as Klassekode, bilde_id as Bilde, leveringsfrist as Frist FROM student;");
 				echo QueryResult($db->CreateResultTable());
 			}
 			catch(Exception $e)
 			{
 				echo QueryResult($e->getMessage());
 			}
-			finally
+			break;
+		}
+		case("bilde"):
+		{
+			try 
 			{
-				unset($db);
+				$db = new DBConn();
+				$db->RunQuery("SELECT bilde_id as ID, opplastings_dato as Opplastet, filnavn as Filnavn, beskrivelse as Beskrivelse FROM bilde;");
+				echo QueryResult($db->CreateResultTable());
+			}
+			catch(Exception $e)
+			{
+				echo QueryResult($e->getMessage());
 			}
 			break;
 		}
@@ -53,7 +60,7 @@ elseif(!empty($_GET["submit"]))
 		{
 			$klassekode = $_GET["klassekode"];
 			$klassenavn = $_GET["klassenavn"];
-			if (validerKlassekode($klassekode)&& validerFelt($klassenavn))
+			if (validerKlassekode($klassekode) && validerFelt($klassenavn))
 			{
 				try 
 				{
@@ -64,10 +71,6 @@ elseif(!empty($_GET["submit"]))
 				catch(Exception $e) 
 				{
 					echo QueryResult($e->getMessage());
-				}
-				finally
-				{
-					unset($db);
 				}
 			}
 			else
@@ -103,11 +106,6 @@ elseif(!empty($_GET["submit"]))
 						catch(Exception $e) 
 						{
 							echo QueryResult($e->getMessage());
-						}
-
-						finally
-						{
-							unset($db);
 						}
 				}
 		else

@@ -9,6 +9,7 @@ include "start.html";
 						<select class="form-control custom-select" onchange="onTabellVelgerChange()" id="tabellVelger" onchange="OnChange_tabellVelger()">
 						<option value="student"> Student </option>
 						<option value="klasse"> Klasse </option>
+						<option value="bilde"> Bilder </option>
 					</select>
 				</div>
 			</div>
