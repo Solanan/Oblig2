@@ -9,7 +9,7 @@ include "start.html";
 						<select class="form-control custom-select" onchange="onTabellVelgerChange()" id="tabellVelger" onchange="OnChange_tabellVelger()">
 						<option value="student"> Student </option>
 						<option value="klasse"> Klasse </option>
-						<option value="bilde"> Bilder </option>
+						<option value="oblig2_bilder"> Bilde </option>
 					</select>
 				</div>
 			</div>
@@ -17,7 +17,7 @@ include "start.html";
 		
 		<div class="form-group">
 				<label>
-					Søkestreng <input type="text" id="keyword" name="keyword" class="form-control" placeholder=" * = velg alt fra tabellen" onkeyup="DoSearch(event)">   
+					Søkestreng <input type="text" id="keyword" name="keyword" class="form-control" placeholder=" * = velg alt fra tabellen" onfocus="GiveUserFeedBack('','BLANK')" onkeyup="DoSearch(event)">   
 				</label>
 		</div>
 	</form>

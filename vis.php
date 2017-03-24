@@ -15,7 +15,7 @@ include "start.html";
 					<input onChange="HentTabell(this.value)" type="radio" value="klasse" name="tabell" autocomplete="off"> Klasse-tabell <br>
 				</label>
 				<label class="btn btn-default">
-					<input onChange="HentTabell(this.value)" type="radio" value="bilde" name="tabell" autocomplete="off"> Bilde-tabell <br>
+					<input onChange="HentTabell(this.value)" type="radio" value="oblig2_bilder" name="tabell" autocomplete="off"> Bilde-tabell <br>
 				</label>
 			</div>
 		</form>

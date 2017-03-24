@@ -17,6 +17,22 @@ if(!empty($_GET["get"]))
 			{
 				echo QueryResult($e->getMessage());
 			}
+
+			break;
+		}
+		case("oblig2_bilder"):
+		{
+			try 
+			{
+				$db = new DBConn();
+				$db->RunQuery("SELECT * FROM oblig2_bilder");
+				echo QueryResult($db->CreateResultTable());
+			}
+			catch(Exception $e)
+			{
+				echo QueryResult($e->getMessage());
+			}
+
 			break;
 		}
 			
@@ -25,22 +41,7 @@ if(!empty($_GET["get"]))
 			try 
 			{
 				$db = new DBConn();
-				$db->RunQuery("SELECT brukernavn as Brukernavn, fornavn as Fornavn,
-				 etternavn as Etternavn, klassekode as Klassekode, bilde_id as Bilde, leveringsfrist as Frist FROM student;");
-				echo QueryResult($db->CreateResultTable());
-			}
-			catch(Exception $e)
-			{
-				echo QueryResult($e->getMessage());
-			}
-			break;
-		}
-		case("bilde"):
-		{
-			try 
-			{
-				$db = new DBConn();
-				$db->RunQuery("SELECT bilde_id as ID, opplastings_dato as Opplastet, filnavn as Filnavn, beskrivelse as Beskrivelse FROM bilde;");
+				$db->RunQuery("SELECT brukernavn as Brukernavn, fornavn as Fornavn, etternavn as Etternavn, klassekode as Klassekode, bildenummer as Bildenummer FROM student;");
 				echo QueryResult($db->CreateResultTable());
 			}
 			catch(Exception $e)
@@ -60,7 +61,7 @@ elseif(!empty($_GET["submit"]))
 		{
 			$klassekode = $_GET["klassekode"];
 			$klassenavn = $_GET["klassenavn"];
-			if (validerKlassekode($klassekode) && validerFelt($klassenavn))
+			if (validerKlassekode($klassekode)&& validerFelt($klassenavn))
 			{
 				try 
 				{
@@ -86,20 +87,22 @@ elseif(!empty($_GET["submit"]))
 			$fornavn = $_GET["fornavn"];
 			$etternavn = $_GET["etternavn"];
 			$klassekode = $_GET["klassekode"];
+			$bildenummer = $_GET["bildenummer"];
 		
 			if (
 				validerKlassekode($klassekode) &&
 				validerFelt($fornavn) &&
 				validerFelt($etternavn) &&
-				validerBrukerNavn($brukernavn)
+				validerBrukerNavn($brukernavn) &&
+				$bildenummer
 			)
 				{			
 					try 
 						{
 							$db = new DBConn();
 							$db->RunQuery(
-								"INSERT INTO student(brukernavn,fornavn,etternavn,klassekode) 
-								VALUES('$brukernavn','$fornavn','$etternavn','$klassekode')");
+								"INSERT INTO student(brukernavn,fornavn,etternavn,klassekode,bildenummer) 
+								VALUES('$brukernavn','$fornavn','$etternavn','$klassekode','$bildenummer')");
 
 							echo QueryResult("Lagring vellykket.");
 						}
@@ -225,9 +228,68 @@ elseif(!empty($_GET["option"]))
 {
 	try 
 	{
-			$db = new DBConn();
-			$result = $db->CreateOptionMenu("klasse","klassekode");
-			echo QueryResult($result);
+		$db = new DBConn();
+
+		$result = null;
+		if($_GET["option"] === "klasse")
+		{
+			$result = $db->CreateOptionMenu($_GET["option"], "klassekode");
+		}
+		elseif($_GET["option"] === "oblig2_bilder") 
+		{
+			$result = $db->CreateOptionMenu($_GET["option"], "beskrivelse");
+		}
+
+
+		echo QueryResult($result);
+	}
+	
+	catch(Exception $e) 
+	{
+		echo QueryResult($e->getMessage());
+	}
+}
+
+elseif(!empty($_GET["deleteStudentsAndClass"]))
+{
+	try 
+	{
+		// [{"pk":"IT7","table":"klasse"}]
+		$data = json_decode($_GET["deleteStudentsAndClass"], true);
+		//$deletePk = $data[0]["pk"];
+		$db = new DBConn();
+		$result = $db->Erase($data);
+		echo QueryResult($result);
+
+	}
+	
+	catch(Exception $e) 
+	{
+		echo QueryResult($e->getMessage());
+	}
+}
+
+elseif(!empty($_GET["deleteStudentsAndPics"]))
+{
+	try 
+	{
+		// [{"pk":"IT7","table":"klasse"}]
+		$data = json_decode($_GET["deleteStudentsAndPics"], true);
+		//$deletePk = $data[0]["pk"];
+		$db = new DBConn();
+		$filnavn = $db->RunQuery("SELECT bildenummer, filnavn FROM oblig2_bilder");
+		$resultset = json_decode($db->GetLastResultInJSON(),true);
+		
+		/*print_r($resultset);*/
+
+		$result = $db->EraseBildeStudent($data);
+		foreach($resultset as $row)
+		{
+			unlink($row['filnavn']);
+		}
+
+		echo QueryResult($result);
+
 	}
 	
 	catch(Exception $e) 
@@ -244,7 +306,7 @@ elseif(!empty($_GET["option"]))
 
 function validerKlasseKode($klassekode)
 {
-	return preg_match("/^[a-zA-ZøæåØÆÅ]{2,10}[0-9]{1}$/", $klassekode);
+	return preg_match("/^[a-zA-ZøæåØÆÅ]{2}[a-zA-ZøæåØÆÅ]*[0-9]{1}$/", $klassekode);
 }
 
 function validerBrukerNavn($brukernavn)

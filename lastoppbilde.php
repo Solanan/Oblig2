@@ -2,7 +2,7 @@
 include ("start.html");
 
     //print_r($_FILES);
-    $dir = "bilder/";
+    $dir = "student_bilder/";
     $fil = $dir . basename($_FILES["fil"]["name"]);
     $filtype = pathinfo($fil , PATHINFO_EXTENSION);
     $filtype = strtolower($filtype);
@@ -22,7 +22,7 @@ include ("start.html");
         print ("Filnavnet eksisterer allerede!<br>");
         $godkjent = false;
     }
-    if ($_FILES["fil"]["size"] > 100000)
+    if ($_FILES["fil"]["size"] > 5000000)
     {
         print ("Filen er for stor!<br>");
         $godkjent = false;
@@ -52,7 +52,7 @@ include ("start.html");
                     include ("database.php");
                     $dato = date('Ymd');
                     $db = new DBConn();
-					$db->RunQuery("INSERT INTO bilde(opplastings_dato,filnavn,beskrivelse) VALUES('$dato','$fil','$beskrivelse')");
+					$db->RunQuery("INSERT INTO oblig2_bilder(opplastings_dato,filnavn,beskrivelse) VALUES('$dato','$fil','$beskrivelse')");
 					echo ("Lagring vellykket.<br>");
                 }
 			catch(Exception $e)

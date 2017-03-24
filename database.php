@@ -23,7 +23,6 @@ class DBConn {
 		
 		// method scope, not class scope
 		include "../settings.php";
-		
 		if(!$this->dbConn = mysqli_connect(
 			$dbSettings->host,
 			$dbSettings->user, 
@@ -35,18 +34,46 @@ class DBConn {
 		}
 	}
 
+	function Erase($data)
+	{
+		for($i = 0; $i < count($data); $i++)
+		{
+			$pk = mysqli_escape_string($this->dbConn, $data[$i]["pk"]);
+			$this->RunQuery("DELETE FROM student WHERE klassekode = '$pk'");
+			$this->RunQuery("DELETE FROM klasse WHERE klassekode = '$pk'");
+		}
+		
+		return "Slettet student(er) og klasse(r)";
+		
+	}
+
+	function EraseBildeStudent($data)
+	{
+		for($i = 0; $i < count($data); $i++)
+		{
+			$pk = mysqli_escape_string($this->dbConn, $data[$i]["pk"]);
+			$this->RunQuery("DELETE FROM student WHERE bildenummer = '$pk'");
+			$this->RunQuery("DELETE FROM oblig2_bilder WHERE bildenummer = '$pk'");
+		}
+		
+		return "Slettet bilder og tilhørende studenter!";
+		
+	}
+
+
 	function UpdateInto($rows) 
 	{
 		foreach ($rows as $row)
 		{
 			$table=$row['table'];
-			
 			switch($table)
 			{
+
 				case ('student'):
 				{
 					$values="fornavn= '" . $row['fornavn'] . "'" . ", etternavn= '" .
-					 $row['etternavn'] . "'" . ", klassekode= '" . $row['klassekode'] . "'";
+					 $row['etternavn'] . "'" . ", klassekode= '" . $row['klassekode'] . "'"
+					 . ", bildenummer= " . $row['bildenummer'];
 					 $pkCol="brukernavn";
 					 $pk=$row['brukernavn'];
 					$this->RunQuery("UPDATE $table SET $values WHERE $pkCol = '$pk' ;");
@@ -61,9 +88,17 @@ class DBConn {
 					$this->RunQuery("UPDATE $table SET $values WHERE $pkCol = '$pk' ;");
 					break;
 				}
+				case ('oblig2_bilder'):
+				{
+					$values="beskrivelse= '" . $row['beskrivelse'] . "'";
+					$pkCol="bildenummer";
+					$pk=$row['bildenummer'];
+					$this->RunQuery("UPDATE $table SET $values WHERE $pkCol = '$pk' ;");
+					break;
+				}
 			}
+			
 		}
-		
 	}
 
 	function SearchTable($tab, $keyword) {
@@ -127,9 +162,9 @@ class DBConn {
 				{
 					$table .= '<tr id=' . $row["klassekode"] . '>';
 				}
-				if($tab === 'bilde')
+				if($tab === 'oblig2_bilder')
 				{
-					$table .= '<tr id=' . $row["bilde_id"] . '>';
+					$table .= '<tr id=' . $row["bildenummer"] . '>';
 				}
 				
 				foreach ($row as $key => $value)
@@ -160,9 +195,9 @@ class DBConn {
 				{
 					$table .= '<td> <input data-table="klasse" data-primarykey=' . $row["klassekode"] . ' type="checkbox"> </td>';
 				}
-				if($tab === "bilde")
+				if($tab === "oblig2_bilder")
 				{
-					$table .= '<td> <input data-table="bilde" data-primarykey=' . $row["bilde_id"] . ' type="checkbox"> </td>';
+					$table .= '<td> <input data-table="oblig2_bilder" data-primarykey=' . $row["bildenummer"] . ' type="checkbox"> </td>';
 				}
 						
 				$table .= "</tr>";
@@ -303,7 +338,16 @@ class DBConn {
 
 		$pkCol = $this->GetPrimaryKeyColumn($table);
 
-		$element = "<select name='klasseKodeVelger'>";
+
+		if($table === "klasse")
+		{
+			$element = "<select name='klasseKodeVelger' id='klasseVelger'>";
+		}
+		else
+		{
+			$element = "<select name='bildeVelger' id='bildeVelger'>";
+		}
+
 			
 		if($labelAttr) { $element .= "<option selected disabled> " . $labelAttr . " </option>"; }
 
